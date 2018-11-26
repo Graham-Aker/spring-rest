@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+	<!-- <property resource="classpath:logback-variables.properties" /> -->
+	<contextName>myAppName</contextName>
+	<!-- 日志路径，请根据实际需要调整 -->
+	<property name="destinationPath" value="logs/" />
+	<property name="fileExt" value=".log" />
+
+	<property name="commonLayoutPattern"
+		value="[%-5level] %d{yy/MM/dd HH:mm:ss.SSS} %thread{15} %logger{36} %m %n" />
+
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder charset="UTF-8">
+			<pattern>${commonLayoutPattern}</pattern>
+			<outputPatternAsHeader>false</outputPatternAsHeader>
+		</encoder>
+	</appender>
+
+
+	<appender name="dailyAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder charset="UTF-8">
+			<pattern>${commonLayoutPattern}</pattern>
+			<outputPatternAsHeader>false</outputPatternAsHeader>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${destinationPath}daily%d{yyyy-MM-dd}${fileExt}
+			</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>INFO</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+
+
+	<appender name="errorAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder charset="UTF-8">
+			<pattern>${commonLayoutPattern}</pattern>
+			<outputPatternAsHeader>false</outputPatternAsHeader>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${destinationPath}error%d{yyyy-MM-dd}${fileExt}
+			</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+
+
+	<appender name="debugAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder charset="UTF-8">
+			<pattern>${commonLayoutPattern}</pattern>
+			<outputPatternAsHeader>false</outputPatternAsHeader>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${destinationPath}debug%d{yyyy-MM-dd}${fileExt}
+			</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>DEBUG</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+
+	<appender name="asyncAppender" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<!-- 请根据实际需求，调整队列大小 -->
+		<queueSize>1024</queueSize>
+		<appender-ref ref="debugAppender" />
+	</appender>
+
+
+	<root level="DEBUG">
+		<appender-ref ref="console" />
+	</root>
+	
+	<logger name="com.xxx" level="DEBUG" additivity="true">
+		<appender-ref ref="debugAppender" />
+	</logger>
+	
+	<logger name="com.alibaba" level="INFO" additivity="true">
+		<appender-ref ref="asyncAppender" />
+	</logger>
+
+	<logger name="org.springframework" level="INFO" additivity="true">
+		<appender-ref ref="asyncAppender" />
+	</logger>
+
+	<logger name="org.apache" level="INFO" additivity="true">
+		<appender-ref ref="asyncAppender" />
+	</logger>
+
+	<logger name="io.netty" level="INFO" additivity="true">
+		<appender-ref ref="asyncAppender" />
+	</logger>
+
+	<logger name="ch.qos.logback" level="INFO" additivity="true">
+		<appender-ref ref="asyncAppender" />
+	</logger>
+
+	<logger name="com.netflix" level="INFO" additivity="true">
+		<appender-ref ref="asyncAppender" />
+	</logger>
+
+</configuration>
